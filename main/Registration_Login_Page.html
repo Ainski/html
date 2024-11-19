@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>注册/登录页面</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f3f4f6;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .container {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: #333;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: #4b5563;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        font-size: 1rem;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .password-hint {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+      }
+
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: #2563eb;
+      }
+
+      .toggle-form {
+        text-align: center;
+        margin-top: 1rem;
+      }
+
+      .toggle-btn {
+        background: none;
+        border: none;
+        color: #3b82f6;
+        font-size: 0.875rem;
+        cursor: pointer;
+      }
+
+      .toggle-btn:hover {
+        color: #2563eb;
+        text-decoration: underline;
+      }
+
+      .alert {
+        padding: 0.75rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        display: none;
+        text-align: center;
+        font-weight: bold;
+      }
+
+      .alert.success {
+        background-color: #ecfdf5;
+        color: #047857;
+        border: 1px solid #6ee7b7;
+        display: block;
+      }
+
+      .alert.error {
+        background-color: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+        display: block;
+      }
+
+      .users-list {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+      }
+
+      .users-list h3 {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+      }
+
+      .user-item {
+        font-size: 0.875rem;
+        color: #4b5563;
+        margin-bottom: 0.25rem;
+      }
+      /* 添加动画效果 */
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .alert {
+        animation: fadeIn 0.3s ease-out;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2 id="formTitle">登录</h2>
+
+      <div id="messageAlert" class="alert"></div>
+
+      <form id="authForm">
+        <div class="form-group">
+          <label for="username">用户名</label>
+          <input type="text" id="username" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">密码</label>
+          <input type="password" id="password" required />
+          <div id="passwordHint" class="password-hint" style="display: none">
+            密码长度必须大于8位
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn">登录</button>
+      </form>
+
+      <div class="toggle-form">
+        <button type="button" id="toggleBtn" class="toggle-btn">
+          没有账号？去注册
+        </button>
+      </div>
+
+      <div class="users-list">
+        <h3>已注册用户：</h3>
+        <div id="usersList"></div>
+      </div>
+    </div>
+
+    <script>
+      // 存储用户数据
+      let users = [];
+      let isLoginMode = true;
+
+      // 获取DOM元素
+      const form = document.getElementById("authForm");
+      const formTitle = document.getElementById("formTitle");
+      const submitBtn = document.getElementById("submitBtn");
+      const toggleBtn = document.getElementById("toggleBtn");
+      const messageAlert = document.getElementById("messageAlert");
+      const passwordHint = document.getElementById("passwordHint");
+      const usersList = document.getElementById("usersList");
+
+      // 切换登录/注册模式
+      toggleBtn.addEventListener("click", () => {
+        isLoginMode = !isLoginMode;
+        formTitle.textContent = isLoginMode ? "登录" : "注册";
+        submitBtn.textContent = isLoginMode ? "登录" : "注册";
+        toggleBtn.textContent = isLoginMode
+          ? "没有账号？去注册"
+          : "已有账号？去登录";
+        passwordHint.style.display = isLoginMode ? "none" : "block";
+        messageAlert.style.display = "none";
+        form.reset();
+      });
+
+      // 显示消息
+      function showMessage(message, isSuccess) {
+        messageAlert.textContent = message;
+        messageAlert.className = `alert ${isSuccess ? "success" : "error"}`;
+        messageAlert.style.display = "block"; // 确保消息显示
+
+        // 如果是成功消息，3秒后自动隐藏
+        if (isSuccess) {
+          setTimeout(() => {
+            messageAlert.style.display = "none";
+          }, 3000);
+        }
+      }
+
+      // 更新用户列表显示
+      function updateUsersList() {
+        usersList.innerHTML = users
+          .map(
+            (user) => `<div class="user-item">用户名: ${user.username}</div>`
+          )
+          .join("");
+      }
+
+      // 表单提交处理
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        if (isLoginMode) {
+          // 登录逻辑
+          const user = users.find(
+            (u) => u.username === username && u.password === password
+          );
+          if (user) {
+            showMessage("登录成功！正在跳转...", true);
+            // 登录成功后延迟1秒跳转
+            setTimeout(() => {
+              window.location.href = "https://dev.mysql.com/downloads/mysql/";
+            }, 1000);
+          } else {
+            showMessage("用户名或密码错误！", false);
+          }
+        } else {
+          // 注册逻辑
+          if (password.length < 8) {
+            showMessage("密码长度必须大于8位!", false);
+            return;
+          }
+
+          if (users.some((u) => u.username === username)) {
+            showMessage("该用户名已被注册！", false);
+            return;
+          }
+
+          users.push({
+            username,
+            password,
+          });
+          showMessage("注册成功！请登录", true);
+          updateUsersList();
+
+          // 切换到登录模式
+          setTimeout(() => {
+            toggleBtn.click();
+          }, 1500);
+        }
+
+        // 只在非登录成功时重置表单
+        if (
+          !(
+            isLoginMode &&
+            users.some(
+              (u) => u.username === username && u.password === password
+            )
+          )
+        ) {
+          form.reset();
+        }
+      });
+    </script>
+  </body>
+</html>
