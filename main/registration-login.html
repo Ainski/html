@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>登录/注册</title>
+    <style>
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-form {
+            text-align: center;
+            color: #007bff;
+            cursor: pointer;
+        }
+        
+        .password-hint {
+            color: #6c757d;
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+        
+        .users-list {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2 id="formTitle">登录</h2>
+
+        <div id="messageAlert" class="alert"></div>
+
+        <div class="form-group">
+            <label>用户名</label>
+            <input type="text" id="username" required />
+        </div>
+
+        <div class="form-group">
+            <label>密码</label>
+            <input type="password" id="password" required />
+            <div id="passwordHint" class="password-hint" style="display: none">
+                密码长度必须大于8位
+            </div>
+        </div>
+
+        <div id="securityQuestionSection" class="form-group" style="display: none;">
+            <label>安全问题 (可选)</label>
+            <input type="text" id="securityQuestion" placeholder="设置找回密码的问题" />
+            <label>答案 (可选)</label>
+            <input type="text" id="securityAnswer" placeholder="设置找回密码的答案" />
+        </div>
+
+        <button onclick="handleFormSubmit()">登录</button>
+
+        <div class="toggle-form" onclick="toggleForm()">没有账号？去注册</div>
+
+        <div class="toggle-form" onclick="toggleForgotPassword()">忘记密码？</div>
+
+        <div class="users-list">
+            <h3>已注册用户：</h3>
+            <div id="usersList"></div>
+        </div>
+    </div>
+
+    <script>
+        let isLoginForm = true;
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        function updateUsersList() {
+            const usersList = document.getElementById("usersList");
+            usersList.innerHTML = users
+                .map((user) => `<div>${user.username}</div>`)
+                .join("");
+        }
+
+        function showMessage(message, isError = false) {
+            const alert = document.getElementById("messageAlert");
+            alert.textContent = message;
+            alert.style.display = "block";
+            alert.className = `alert ${isError ? "alert-danger" : "alert-success"}`;
+        }
+
+        function toggleForm() {
+            isLoginForm = !isLoginForm;
+            document.getElementById("formTitle").textContent = isLoginForm ?
+                "登录" :
+                "注册";
+            document.querySelector("button").textContent = isLoginForm ?
+                "登录" :
+                "注册";
+            document.querySelector(".toggle-form").textContent = isLoginForm ?
+                "没有账号？去注册" :
+                "已有账号？去登录";
+            document.getElementById("messageAlert").style.display = "none";
+            document.getElementById("securityQuestionSection").style.display = isLoginForm ? "none" : "block";
+        }
+
+        function handleFormSubmit() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const securityQuestion = document.getElementById("securityQuestion").value;
+            const securityAnswer = document.getElementById("securityAnswer").value;
+
+            if (!username || !password) {
+                showMessage("请填写所有字段！", true);
+                return;
+            }
+
+            if (!isLoginForm) {
+                // 注册逻辑
+                if (password.length < 8) {
+                    showMessage("密码长度必须大于8位！", true);
+                    return;
+                }
+
+                if (users.some((user) => user.username === username)) {
+                    showMessage("用户名已存在！", true);
+                    return;
+                }
+
+                if (!securityQuestion && !securityAnswer) {
+                    if (!confirm("丢失密码后可能无法找回，确定直接注册吗？")) {
+                        return;
+                    }
+                }
+
+                users.push({
+                    username,
+                    password,
+                    securityQuestion,
+                    securityAnswer,
+                });
+                localStorage.setItem("users", JSON.stringify(users));
+                updateUsersList();
+                showMessage("注册成功！");
+                toggleForm(); // 切换回登录表单
+            } else {
+                // 登录逻辑
+                const user = users.find(
+                    (u) => u.username === username && u.password === password
+                );
+                if (user) {
+                    // 保存登录状态和用户信息
+                    localStorage.setItem(
+                        "currentUser",
+                        JSON.stringify({
+                            username: user.username,
+                            isLoggedIn: true,
+                        })
+                    );
+                    showMessage("登录成功！即将跳转到论坛...");
+                    // 延迟跳转，让用户看到成功消息
+                    setTimeout(() => {
+                        window.location.href = "Modified_Forum_Page.html";
+                    }, 1500);
+                } else {
+                    showMessage("用户名或密码错误！", true);
+                }
+            }
+        }
+
+        function toggleForgotPassword() {
+            const username = prompt("请输入您的用户名以找回密码:");
+            if (!username) return;
+
+            const user = users.find((u) => u.username === username);
+            if (!user) {
+                showMessage("用户不存在！", true);
+                return;
+            }
+
+            if (!user.securityQuestion) {
+                showMessage("该用户未设置安全问题，无法找回密码！", true);
+                return;
+            }
+
+            const answer = prompt(`安全问题: ${user.securityQuestion}`);
+            if (answer && answer === user.securityAnswer) {
+                const newPassword = prompt("请输入新密码 (至少8位):");
+                if (newPassword && newPassword.length >= 8) {
+                    user.password = newPassword;
+                    localStorage.setItem("users", JSON.stringify(users));
+                    showMessage("密码重置成功！请登录。");
+                } else {
+                    showMessage("密码未重置，密码长度必须大于8位！", true);
+                }
+            } else {
+                showMessage("答案不正确，无法找回密码！", true);
+            }
+        }
+
+        // 初始化用户列表
+        updateUsersList();
+    </script>
+</body>
+
+</html>
