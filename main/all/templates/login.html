@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <title>用户系统</title>
+    <style>
+      /* 最小化必要样式 */
+      .form-container {
+        display: none;
+      }
+      .active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 导航按钮 -->
+    <div id="navButtons">
+      <button onclick="showForm('passwordLogin')">密码登录</button>
+      <button onclick="showForm('emailLogin')">邮箱登录</button>
+      <button onclick="showForm('register')">注册账号</button>
+    </div>
+
+    <!-- 密码登录表单 -->
+    <div id="passwordLoginForm" class="form-container active">
+      <h2>密码登录</h2>
+      <input type="email" id="pwdLoginEmail" placeholder="邮箱" />
+      <input type="password" id="pwdLoginPassword" placeholder="密码" />
+      <button onclick="passwordLogin()">登录</button>
+    </div>
+
+    <!-- 邮箱验证码登录表单 -->
+    <div id="emailLoginForm" class="form-container">
+      <h2>验证码登录</h2>
+      <input type="email" id="codeLoginEmail" placeholder="邮箱" />
+      <input type="text" id="loginCode" placeholder="验证码" />
+      <button onclick="sendCode('login')">发送验证码</button>
+      <button onclick="emailLogin()">登录</button>
+    </div>
+
+    <!-- 注册表单 -->
+    <div id="registerForm" class="form-container">
+      <h2>注册账号</h2>
+      <input type="email" id="regEmail" placeholder="邮箱" />
+      <input type="text" id="regUsername" placeholder="用户名" />
+      <input type="password" id="regPassword" placeholder="密码" />
+      <input type="text" id="regCode" placeholder="验证码" />
+      <button onclick="sendCode('register')">发送验证码</button>
+      <button onclick="register()">注册</button>
+    </div>
+
+    <script>
+      // 表单切换功能
+      function showForm(formType) {
+        // 隐藏所有表单
+        document.querySelectorAll(".form-container").forEach((form) => {
+          form.classList.remove("active");
+        });
+
+        // 显示选中的表单
+        let formId;
+        switch (formType) {
+          case "passwordLogin":
+            formId = "passwordLoginForm";
+            break;
+          case "emailLogin":
+            formId = "emailLoginForm";
+            break;
+          case "register":
+            formId = "registerForm";
+            break;
+        }
+        document.getElementById(formId).classList.add("active");
+      }
+
+      // 发送验证码
+      async function sendCode(type) {
+        const email =
+          type === "register"
+            ? document.getElementById("regEmail").value
+            : document.getElementById("codeLoginEmail").value;
+
+        const response = await fetch("/send_code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const result = await response.json();
+        alert(result.message);
+      }
+
+      // 密码登录
+      async function passwordLogin() {
+        const data = {
+          email: document.getElementById("pwdLoginEmail").value,
+          password: document.getElementById("pwdLoginPassword").value,
+        };
+        await handleLogin(data);
+      }
+
+      // 验证码登录
+      async function emailLogin() {
+        const data = {
+          email: document.getElementById("codeLoginEmail").value,
+          verification_code: document.getElementById("loginCode").value,
+        };
+        await handleLogin(data);
+      }
+
+      // 统一处理登录请求
+      async function handleLogin(data) {
+        const response = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        if (result.status === "success") {
+          window.location.href = result.redirect;
+        } else {
+          alert(result.message);
+        }
+      }
+
+      // 注册功能
+      async function register() {
+        const data = {
+          email: document.getElementById("regEmail").value,
+          code: document.getElementById("regCode").value,
+          username: document.getElementById("regUsername").value,
+          password: document.getElementById("regPassword").value,
+        };
+        const response = await fetch("/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        if (result.status === "success") {
+          alert("注册成功，请登录");
+          showForm("passwordLogin"); // 注册成功后跳转到登录页面
+        } else {
+          alert(result.message);
+        }
+      }
+    </script>
+  </body>
+</html>
