@@ -46,7 +46,7 @@ def send_verification_code(email):
     verification_code = str(random.randint(100000, 999999))
     
     message = MIMEText(f'您的验证码是: {verification_code}', 'plain', 'utf-8')
-    message['Subject'] = Header('注册验证码', 'utf-8')
+    message['Subject'] = Header('验证码', 'utf-8')
     message['From'] = SMTP_CONFIG['sender']
     message['To'] = email
     
@@ -115,20 +115,33 @@ def send_code():
         return jsonify({'status': 'error', 'message': '无效的请求数据'}), 400
 
     email = data.get('email')
+    is_register = data.get('is_register', False)  # 新增参数，用于区分是注册还是登录验证码
+
     if not email or not validate_email(email):
         return jsonify({'status': 'error', 'message': '无效的邮箱地址'})
     
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT email FROM users WHERE email = %s", (email,))
-    if cursor.fetchone():
+    
+    try:
+        cursor.execute("SELECT email FROM users WHERE email = %s", (email,))
+        user_exists = cursor.fetchone() is not None
+
+        # 注册时检查邮箱是否已存在
+        if is_register and user_exists:
+            return jsonify({'status': 'error', 'message': '该邮箱已注册'})
+        
+        # 登录时检查邮箱是否存在
+        if not is_register and not user_exists:
+            return jsonify({'status': 'error', 'message': '该邮箱未注册'})
+        
+        if send_verification_code(email):
+            return jsonify({'status': 'success', 'message': '验证码发送失败'})
+        return jsonify({'status': 'error', 'message': '验证码已发送'})
+    
+    finally:
         cursor.close()
         conn.close()
-        return jsonify({'status': 'error', 'message': '该邮箱已注册'})
-    
-    if send_verification_code(email):
-        return jsonify({'status': 'success', 'message': '验证码已发送'})
-    return jsonify({'status': 'error', 'message': '验证码发送失败'})
 
 @app.route('/register', methods=['POST', 'OPTIONS'])
 def register():
@@ -183,10 +196,17 @@ def login():
     cursor = conn.cursor()
     
     try:
+        # 首先检查邮箱是否存在
+        cursor.execute("SELECT user_id FROM users WHERE email = %s", (email,))
+        user = cursor.fetchone()
+        if not user:
+            return jsonify({'status': 'error', 'message': '邮箱不存在'})
+
         if verification_code:
             stored_code = session.get(f'verification_code_{email}')
             if not stored_code or verification_code != stored_code:
                 return jsonify({'status': 'error', 'message': '验证码无效'})
+            session.pop(f'verification_code_{email}', None)  # 使用后删除验证码
         else:
             hashed_password = hash_password(password)
             cursor.execute("SELECT user_id FROM users WHERE email = %s AND password = %s", (email, hashed_password))
