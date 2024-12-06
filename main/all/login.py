@@ -11,6 +11,8 @@ import re
 import ssl
 import sys
 import os
+import cryptography
+import base64
 
 # 设置文件编码
 if sys.platform.startswith('win'):
@@ -26,7 +28,7 @@ DB_CONFIG = {
     'host': '127.0.0.1',
     'port': 3306,
     'user': 'root',
-    'passwd': '1',
+    'passwd': 'chr3928700',
     'charset': 'utf8',
     'db': 'online_forum'
 }
@@ -156,8 +158,8 @@ def register():
     code = data.get('code')
     username = data.get('username')
     password = data.get('password')
-    #email，code，username，password添加到数据库
-    
+
+
 
     
     stored_code = session.get(f'verification_code_{email}')
