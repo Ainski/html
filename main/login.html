@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">                                                          <!-- head包含了文档的元数据meta-data-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">                           <!-- 此行是为了保证老式的IE浏览器可以以最佳方式显示网站，但是可以去掉，因为现在老式的IE已经out了-->
+  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">          <!--设置视口viewport，确保在移动设备上也能很好地展示-->
+    <title>个人主页</title>                                                         <!--浏览器标签页显示该文档的标题-->
+    <link rel="stylesheet" href="./basewxj.css">                                   <!--rel是必需的，表明当前文档和被链接文档的关系-->
+    <!--href表明了链接样式表文件的路径；src表明了链接的JavaScript文件的路径-->
+    <script src="./jqwxj.js"></script>
+    <link rel="stylesheet" href="./index1wxj.css">
+</head>
+<body>
+    <!--div定义文档中的分区division/section-->
+    
+    <!--canvas通过脚本JavaScript实时绘制图形，没有脚本就没效果-->
+    <canvas class="canvas-wrap" id="triangle-lost-in-space" resize="true">
+  
+    </canvas>
+  
+  
+    <!-- 遮罩层-遮住其他图层-->
+    <div class="zhezhao" id="zhezhao">
+      <!--span是行内,对行内的文本进行样式设计元素，div是块级元素-->
+      <span class="close">
+        <!--svg的描述-->
+        <svg t="1649229755294" class="icon" viewBox="0 0 1024 1024" version="1.1"
+          xmlns="http://www.w3.org/2000/svg" p-id="4692" width="32" height="32">
+          <path
+            d="M512 0C229.187368 0 0 229.187368 0 512 0 794.812632 229.187368 1024 512 1024 794.812632 1024 1024 794.812632 1024 512 1024 229.187368 794.812632 0 512 0ZM512 970.105263C259.368421 970.105263 53.894737 764.631579 53.894737 512 53.894737 259.368421 259.368421 53.894737 512 53.894737 764.631579 53.894737 970.105263 259.368421 970.105263 512 970.105263 764.631579 764.631579 970.105263 512 970.105263ZM550.130526 512 719.629474 342.366316C730.273684 331.856842 730.273684 314.88 719.629474 304.370526 709.12 293.726316 692.143158 293.726316 681.633684 304.370526L512 473.869474 342.366316 304.370526C331.856842 293.726316 314.88 293.726316 304.370526 304.370526 293.726316 314.88 293.726316 331.856842 304.370526 342.366316L473.869474 512 304.370526 681.633684C293.726316 692.143158 293.726316 709.12 304.370526 719.629474 309.625263 724.884211 316.496842 727.578947 323.368421 727.578947 330.24 727.578947 337.111579 724.884211 342.366316 719.629474L512 550.130526 681.633684 719.629474C686.888421 724.884211 693.76 727.578947 700.631579 727.578947 707.503158 727.578947 714.374737 724.884211 719.629474 719.629474 730.273684 709.12 730.273684 692.143158 719.629474 681.633684L550.130526 512Z"
+            p-id="4693">
+          </path>
+        </svg>
+  
+     </span>
+  
+    </div>
+    <!-- 遮罩层结束 -->
+    <div id="navButtons">
+        <button class="active">密码登录</button>
+        <button>邮箱登录</button>
+        <button>注册账号</button>
+      </div>
+  
+      <div id="passwordLoginForm" class="form-container active">
+        <h2>密码登录</h2>
+        <form>
+          <div>
+            <label for="passwordLoginEmail">邮箱：</label>
+            <input type="email" id="passwordLoginEmail" required />
+          </div>
+          <div>
+            <label for="passwordLoginPassword">密码：</label>
+            <input type="password" id="passwordLoginPassword" required />
+          </div>
+          <button type="submit">登录</button>
+        </form>
+      </div>
+  
+      <div id="emailLoginForm" class="form-container">
+        <h2>验证码登录</h2>
+        <form>
+          <div>
+            <label for="emailLoginEmail">邮箱：</label>
+            <input type="email" id="emailLoginEmail" required />
+          </div>
+          <div>
+            <label for="emailLoginCode">验证码：</label>
+            <input type="text" id="emailLoginCode" required />
+            <button type="button" id="emailLoginSendCode">发送验证码</button>
+          </div>
+          <button type="submit">登录</button>
+        </form>
+      </div>
+  
+      <div id="registerForm" class="form-container">
+        <h2>注册账号</h2>
+        <form>
+          <div>
+            <label for="registerEmail">邮箱：</label>
+            <input type="email" id="registerEmail" required />
+          </div>
+          <div>
+            <label for="registerCode">验证码：</label>
+            <input type="text" id="registerCode" required />
+            <button type="button" id="registerSendCode">发送验证码</button>
+          </div>
+          <div>
+            <label for="registerUsername">用户名：</label>
+            <input type="text" id="registerUsername" required />
+          </div>
+          <div>
+            <label for="registerPassword">密码：</label>
+            <input type="password" id="registerPassword" required />
+          </div>
+          <button type="submit">注册</button>
+        </form>
+      </div>
+  
+      <script src="/static/js/login.js"></script>
+     
+  
+  </body>
+</html>

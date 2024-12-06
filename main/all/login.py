@@ -156,6 +156,9 @@ def register():
     code = data.get('code')
     username = data.get('username')
     password = data.get('password')
+    #email，code，username，password添加到数据库
+    
+
     
     stored_code = session.get(f'verification_code_{email}')
     if not stored_code or code != stored_code:
@@ -179,7 +182,7 @@ def register():
         cursor.close()
         conn.close()
 
-@app.route('/login', methods=['POST', 'OPTIONS'])
+@app.route('/login', methods=['POST', 'OPTIONS', 'GET'])
 def login():
     if request.method == 'OPTIONS':
         response = jsonify({'status': 'ok'})
