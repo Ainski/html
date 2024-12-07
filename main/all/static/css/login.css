@@ -8,7 +8,10 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-image: url("../img/preview.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -24,10 +27,10 @@ body {
 
 /* 表单盒子 */
 .form-box {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.85);
   border-radius: 20px;
   padding: 40px 30px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
 }
 
@@ -40,7 +43,7 @@ body {
 .logo-circle {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
   border-radius: 50%;
   margin: 0 auto 15px;
   position: relative;
@@ -90,7 +93,7 @@ body {
 }
 
 .nav-tabs button.active {
-  color: #667eea;
+  color: #ff9a9e;
 }
 
 .nav-tabs button.active::after {
@@ -100,7 +103,7 @@ body {
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
 }
 
 /* 表单容器 */
@@ -129,9 +132,9 @@ body {
 }
 
 .input-group input:focus {
-  border-color: #667eea;
+  border-color: #ff9a9e;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 154, 158, 0.1);
 }
 
 .input-icon {
@@ -178,7 +181,7 @@ body {
 .submit-btn {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
   border: none;
   border-radius: 8px;
   color: white;
@@ -190,7 +193,7 @@ body {
 
 .submit-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 12px rgba(255, 154, 158, 0.3);
 }
 
 /* 动画 */
