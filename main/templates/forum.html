@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>简单论坛</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: #f5f5f5;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logout-btn, .login-btn, .delete-account-btn {
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .logout-btn {
+        background-color: #dc3545;
+      }
+
+      .delete-account-btn {
+        background-color: #ff6347;
+      }
+
+      .search-section {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .search-section input,
+      .search-section select {
+        padding: 8px;
+        margin-right: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .search-section button {
+        padding: 8px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .new-post-section {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .new-post-section input,
+      .new-post-section textarea {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .new-post-section button {
+        padding: 8px 15px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .posts-section {
+        background-color: gray;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .post {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        background-color: gray;
+      }
+
+      .post:last-child {
+        border-bottom: none;
+      }
+
+      .post-header {
+        display: flex;
+        color:black;
+        font-size: 20px;
+        gap: 10px;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .post-content {
+        white-space: pre-line;
+        margin-bottom: 15px;
+      }
+
+      .comments-section {
+        margin-top: 10px;
+        padding-left: 20px;
+      }
+      .comment-content{
+        white-space: pre-line;
+        font-size: 16px;
+        color:rgb(180,130,91);
+
+      }
+      .comment-username{
+        font-size: 14px;
+        color:rgb(213,180,120);
+
+      }
+      .comment-time{
+          margin-left:100px;
+          font-size: 14px;
+          color:rgb(213,180,120);
+      }
+
+      .comment {
+
+        background-color: #f8f9fa;
+        padding: 10px;
+        margin-bottom: 5px;
+        border-radius: 4px;
+      }
+
+      .new-comment {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+
+      }
+
+      .new-comment input {
+        flex-grow: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .new-comment button {
+        padding: 8px 15px;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        opacity: 0.9;
+      }
+
+      .personal-page-btn{
+        padding: 5px 10px;
+        background-color: #003bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    
+    </style>
+    <link rel="stylesheet" href="/static/css/cursor.css" />
+    <link rel="stylesheet" href="/static/css/cherry-blossom.css" />
+    <link rel="stylesheet" href="/static/css/basewxj.css">                                   <!--rel是必需的，表明当前文档和被链接文档的关系-->
+    <!--href表明了链接样式表文件的路径；src表明了链接的JavaScript文件的路径-->
+    <script src="/static/js/jq_pg.js"></script>
+    <link rel="stylesheet" href="/static/css/index1wxj.css">
+
+  </head>
+ <body>
+    <div class="header">
+      <h1>简单论坛</h1>
+      <div class="user-info">
+        <span id="welcomeMessage">欢迎，<span id="currentUsername"></span></span>
+        <button class="login-btn" id="loginBtn" onclick="redirectToLogin()" >登录</button>
+        <button class="logout-btn" id="logoutBtn" onclick="logout()" >退出登录</button>
+        <button class="personal-page-btn" id="personalPageBtn-0" onclick="showPersonalPage()">个人中心</button>
+
+      </div>
+    </div>
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="new-post-section" id="newPostSection">
+      <input type="text" id="postTitle" placeholder="帖子标题" />
+      <textarea id="postContent" rows="4" placeholder="帖子内容"></textarea>
+      <button onclick="createPost()">发布帖子</button>
+    </div>
+
+    <!-- 帖子列表 -->
+    <div class="posts-section" id="postsContainer"></div> <!-- 帖子列表容器 -->
+    <!-- 帖子详情 -->
+    <div class="post-detail-section" id="postDetailSection"></div> <!-- 帖子详情容器 -->
+    <!-- 通过showPost()函数显示帖子详情 -->
+
+
+
+    <script>
+        let isLoggedIn = false;
+     let userEmail = '';
+
+     //重新登录,content-type:application/json
+     function redirectToLogin() {
+         fetch('/logout', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                checkLogin(); // 重新检查登录状态
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error(error));
+        window.location.href = '/login.html';
+     }
+     // 删除账号
+     function deleteAccount() {
+        if (confirm('确认要删除账号吗？')) {
+          fetch('/delete_account', {
+            method: 'POST'
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.status ==='success') {
+                window.location.href = '/';
+              } else {
+                alert(data.message);
+              }
+           })
+          .catch(error => console.error(error));
+        }
+     }
+
+     // 搜索帖子
+     function searchPosts() {
+        const searchInput = document.getElementById('searchInput').value;
+        const searchType = document.getElementById('searchType').value;
+
+        if (searchInput) {
+            fetch('/search_topics?q=' + searchInput + '&type=' + searchType)
+            .then(response => response.json())
+            .then(data => {
+                const postsContainer = document.getElementById('postsContainer');
+                postsContainer.innerHTML = ''; // 清空现有内容
+
+                data.topics.forEach(topic => {
+                    const postElement = document.createElement('div');
+                    postElement.className = 'post';
+                    postElement.innerHTML = `
+                        <div class="post-header">
+                            <span>${topic.title}</span>
+                            <span>${topic.created_at}</span>
+                        </div>
+                        <div class="post-content">${topic.content}</div>
+                        <div class="comments-section">
+                            <div class="new-comment">
+                                <input type="text" placeholder="添加评论..." />
+                                <button onclick="addComment('${topic.topic_id}')">评论</button>
+                            </div>
+                        </div>
+                    `;
+                    postsContainer.appendChild(postElement);
+                });
+
+            })
+            .catch(error => console.error(error));
+        }
+     }
+
+     function checkLogin() {
+      fetch('/get_user_status')
+            .then(response => response.json())
+            .then(data => {
+              if (data.is_login) {
+                isLoggedIn = true;
+                userEmail = data.email;
+                document.getElementById('welcomeMessage').innerHTML = '欢迎，' + data.username;
+                document.getElementById('currentUsername').innerHTML = data.username;
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+                document.getElementById('deleteAccountBtn').style.display = 'inline-block';
+
+              } else {
+                isLoggedIn = false;
+                userEmail = '';
+                document.getElementById('welcomeMessage').innerHTML = '欢迎，游客';
+                document.getElementById('currentUsername').innerHTML = '';
+                document.getElementById('loginBtn').style.display = 'inline-block';
+                document.getElementById('logoutBtn').style.display = 'none';
+                document.getElementById('deleteAccountBtn').style.display = 'none';
+              }
+            }
+            )
+            .catch(error => console.error(error));
+     }
+
+     // 初始化
+     function init() {
+        checkLogin();
+        renderPosts();
+     }
+
+     // 渲染帖子列表
+function renderPosts() {
+     fetch('/get_topics')
+            .then(response => response.json())
+            .then(data => {
+                const postsContainer = document.getElementById('postsContainer');
+                postsContainer.innerHTML = ''; // 清空现有内容
+
+                data.topics.forEach(topic => {
+                    const postElement = document.createElement('div');
+                    postElement.className = 'post';
+                    postElement.innerHTML = `
+                        <div class="post-header">
+                            <span>${topic[1]}</span>
+                            <span>${new Date(topic[4]).toLocaleString()}</span>
+                        </div>
+                        <div class="post-content">${topic[2]}</div>
+                        <div class="comments-section">
+                            <div class="new-comment">
+                                <input type="text" placeholder="添加评论..." id="commentInput-${topic[0]}" />
+                                <button class="comment-btn" data-topic-id="${topic[0]}">评论</button>
+                            </div>
+                            <br>
+                            <div class="comment-list" id="comment-list-${topic[0]}"></div>
+                        </div>
+                    `;
+                    postsContainer.appendChild(postElement);
+
+                    // 获取评论
+                    fetch(`/get_topic_comments/${topic[0]}`)
+                        .then(response => response.json())
+                        .then(commentsData => {
+
+                            const commentList = document.getElementById(`comment-list-${topic[0]}`);
+                            commentsData.comments.forEach(comment => {
+                                console.log(comment);
+                                const commentElement = document.createElement('div');
+                                commentElement.className = 'comment';
+                                commentElement.innerHTML = `
+                                    <span class="comment-username">${comment[4]}</span>
+                                    <span class="comment-time">${new Date(comment[3]).toLocaleString()}</span>
+                                    <div class="comment-content">${comment[1]}</div>
+                                    <hr>
+                                `;
+                                commentList.appendChild(commentElement);
+                            });
+                        })
+                        .catch(error => console.error(error));
+                });
+            })
+            .catch(error => console.error(error));
+     }
+
+     // 添加评论
+     function addComment(topic_id) {
+        const commentInput = document.getElementById(`commentInput-${topic_id}`);
+        const comment = commentInput.value;
+
+        if (comment) {
+            fetch('/post_comment/' + topic_id, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: comment })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        commentInput.value = '';
+                        renderPosts(); // 重新渲染帖子列表
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error(error));
+        }
+     }
+
+     // 发布帖子
+     function createPost() {
+        const title = document.getElementById('postTitle').value;
+        const content = document.getElementById('postContent').value;
+
+        if (title && content) {
+            fetch('/post_topic', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title: title, content: content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('postTitle').value = '';
+                    document.getElementById('postContent').value = '';
+                    renderPosts(); // 重新渲染帖子列表
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error(error));
+        }
+     }
+
+     // 退出登录
+     function logout() {
+        fetch('/logout', {
+            method: 'GET'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                checkLogin(); // 重新检查登录状态
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error(error));
+        window.location.href = '/login.html';
+     }
+
+     //显示帖子，通过数据库获取数据，渲染到页面上
+     function showPost(topic_id) {
+        fetch('/get_post/' + topic_id)
+            .then(response => response.json())
+            .then(data => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <span>${data.title}</span>
+                        <span>${data.created_at}</span>
+                    </div>
+                    <div class="post-content">${data.content}</div>
+                    <div class="comments-section">
+                        <div class="new-comment">
+                            <input type="text" placeholder="添加评论..." />
+                            <button onclick="addComment('${data.topic_id}')">评论</button>
+                            <hr>
+                        </div>
+                        <div class="comment-list">
+                            ${data.comments.map(comment => `
+                                <div class="comment">
+                                    <span>${comment.username}</span>
+                                    <span>${comment.created_at}</span>
+                                    <p>${comment.content}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('postsContainer').innerHTML = ''; // 清空现有内容
+                document.getElementById('postsContainer').appendChild(postElement);
+             })
+            .catch(error => console.error(error));
+     }
+     // 事件委托
+    document.getElementById('postsContainer').addEventListener('click', function(event) {
+        if (event.target.classList.contains('comment-btn')) {
+            const topic_id = event.target.getAttribute('data-topic-id');
+            addComment(topic_id);
+        }
+    })
+
+    function showPersonalPage() {
+        checkLogin();
+        if (isLoggedIn && userEmail) {
+            window.location.href = '/personal_page/' + userEmail;
+        } else {
+            alert('请先登录！');
+        }
+    }
+     // 初始化页面
+     init();
+    </script>
+    <script src="../static/js/cherry-blossom.js"></script>
+    <script src="../static/js/cursor.js"></script>
+    <script src="../static/js/basewxj.js"></script>
+  </body>
+</html>

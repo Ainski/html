@@ -1,0 +1,110 @@
+/* 樱花容器 */
+.sakura-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 樱花样式 */
+.sakura {
+  position: absolute;
+  background: #ffa7c4;
+  border-radius: 150% 0 150% 0;
+  display: block;
+  transition: transform 0.1s linear;
+  will-change: transform, opacity;
+}
+
+.sakura::after {
+  content: "";
+  position: absolute;
+  top: -14%;
+  left: -10%;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #ffa7c4;
+  border-radius: 150% 0 150% 0;
+  transform: rotate(15deg);
+  opacity: 0.9;
+}
+
+/* 确保登录框在樱花之上 */
+.login-page {
+  position: relative;
+  z-index: 2;
+}
+
+/* 添加模糊效果，增加层次感 */
+.sakura {
+  filter: blur(0.3px);
+}
+
+/* 为不同大小的樱花设置不同的模糊度和透明度 */
+.sakura[style*="width: 10px"] {
+  opacity: 0.7;
+  filter: blur(0.5px);
+}
+
+.sakura[style*="width: 20px"] {
+  opacity: 0.8;
+  filter: blur(0.3px);
+}
+
+.sakura[style*="width: 25px"] {
+  opacity: 0.9;
+  filter: blur(0.2px);
+}
+/* 在原有的樱花样式基础上添加以下内容 */
+
+/* 绽放特效的花瓣样式 */
+.burst-petal {
+  position: absolute;
+  transform-origin: center;
+  background: linear-gradient(45deg, #ffa7c4, #ffccd5);
+  box-shadow: 0 0 5px rgba(255, 167, 196, 0.3);
+}
+
+.burst-petal::after {
+  background: linear-gradient(45deg, #ffccd5, #ffa7c4);
+}
+
+/* 中心光效 */
+.burst-effect {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: white;
+  animation: burstLight 1s ease-out forwards;
+  pointer-events: none;
+}
+
+/* 光效动画 */
+@keyframes burstLight {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    box-shadow: 0 0 20px 10px rgba(255, 167, 196, 0.8),
+      0 0 40px 20px rgba(255, 167, 196, 0.6),
+      0 0 60px 30px rgba(255, 167, 196, 0.4);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+    box-shadow: 0 0 40px 20px rgba(255, 167, 196, 0),
+      0 0 80px 40px rgba(255, 167, 196, 0),
+      0 0 120px 60px rgba(255, 167, 196, 0);
+  }
+}
+
+/* 确保登录框可以正常点击 */
+.login-page {
+  position: relative;
+  z-index: 2;
+}
