@@ -280,6 +280,20 @@ def get_username():
         cursor.close()
         conn.close()
 
+def inner_get_username(email):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT username FROM users WHERE email = %s", (email,))
+        username = cursor.fetchone()
+        return username
+    except Exception as e:
+        return None
+
+    finally:
+        cursor.close()
+        conn.close()
 
 def get_db_connection():
     return pymysql.connect(**DB_CONFIG)
@@ -462,7 +476,7 @@ def login():
             if not cursor.fetchone():
                 return jsonify({'status': 'error', 'message': '邮箱或密码错误'})
 
-        #cursor.execute("UPDATE users SET last_login = %s WHERE email = %s", (datetime.now(), email))
+        cursor.execute("UPDATE users SET last_login = %s WHERE email = %s", (datetime.now(), email))
         #更新登录时间和登录状态
         cursor.execute("UPDATE users SET is_login = 1 WHERE email = %s", (email,))
         conn.commit()
@@ -569,10 +583,11 @@ def post_topic():
 
     conn = get_db_connection()
     cursor = conn.cursor()
+    user_name = inner_get_username(user_email)
 
     try:
-        #cursor.execute("INSERT INTO topics (title, content, user_email, created_at) VALUES (%s, %s, %s, %s)", (title, content, user_email, datetime.now()))
-        cursor.execute("INSERT INTO topics (topic_id, title, content, user_email, created_at) VALUES (%s, %s, %s, %s, %s)", (topic_id, title, content, user_email, datetime.now()))
+        #cursor.execute("INSERT INTO topics (title, content, user_email, created_at, user_name) VALUES (%s, %s, %s, %s, %s)", (title, content, user_email, datetime.now(), user_name))
+        cursor.execute("INSERT INTO topics (topic_id, title, content, user_email, created_at, user_name) VALUES (%s, %s, %s, %s, %s,%s)", (topic_id, title, content, user_email, datetime.now(), user_name))
         conn.commit()
         return jsonify({'status': 'success', 'message': '发帖成功'})
     except Exception as e:
@@ -587,7 +602,7 @@ def get_topics():
     cursor = conn.cursor()
 
     try:
-        cursor.execute("SELECT topic_id, title, content, user_email, created_at FROM topics")
+        cursor.execute("SELECT topic_id, title, content, user_email, created_at , user_name FROM topics ORDER BY created_at DESC")
         topics = cursor.fetchall()
         return jsonify({'status': 'success', 'topics': topics})
     except Exception as e:
@@ -602,7 +617,7 @@ def get_topic_comments(topic_id):
     cursor = conn.cursor()
 
     try:
-        cursor.execute("SELECT comment_id, content, user_email, created_at, user_name FROM comments WHERE topic_id = %s", (topic_id,))
+        cursor.execute("SELECT comment_id, content, user_email, created_at, user_name FROM comments WHERE topic_id = %s ORDER BY created_at DESC", (topic_id,))
         comments = cursor.fetchall()
 
         return jsonify({

@@ -360,7 +360,7 @@ function renderPosts() {
                     postElement.className = 'post';
                     postElement.innerHTML = `
                         <div class="post-header">
-                            <span>${topic[1]}</span>
+                            <span>${topic[1]}</span><span>${topic[5]}</span>
                             <span>${new Date(topic[4]).toLocaleString()}</span>
                         </div>
                         <div class="post-content">${topic[2]}</div>
